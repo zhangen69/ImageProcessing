@@ -11,204 +11,181 @@
 import java.io.*;
 
 public class Assignment1 {
+
     public static String byteOrder = null;
 
     public static void main(String[] args) {
         try {
-            String fileName = "yoda.tif";
+//            String fileName = "yoda.tif";
+            String fileName = "lena.tif";
             File file = new File(fileName);
             FileInputStream fis = new FileInputStream(file);
-            // get file name
             System.out.println("File Name: " + file.getName());
             int value;
             int index = 0;
             int offsetNextIFD = -1;
             int stripOffsets = -1;
-//            String byteOrder = null;
             int dataColumnCount = 0;
             String[][] dataEntryArr = null;
             int dataEntryIndex1 = 0;
             int totalDE = -1;
+            byte[] rawBytes = null;
+            int rawBytesCount = 0;
+            File outputFile = new File("assignment1.raw");
+            FileOutputStream fop = new FileOutputStream(outputFile);
             while ((value = fis.read()) != -1) {
-                // get byte order
-                // check is LSB or MSB
-                // 8 bytes - file header strucutre
-                // 2 bytes - byte order 
-                // 2 bytes - version
-                // 4 bytes - offset of the first IFD
                 if (index == 0) {
                     int value2 = fis.read();
-                    int[] nums = {value, value2};
-                    String hex = sumDecsToHexString(nums);
+                    String hex = getHexString(value) + getHexString(value2);
                     if (hex.equals("4949")) {
                         byteOrder = "LSB";
-                    } else if (hex.equals("4d4d")) {
+                    } else if (hex.equals("4D4D")) {
                         byteOrder = "MSB";
                     }
                     System.out.println("--------------------- Header File Data -------------------------");
                     System.out.println("Byte Order: " + byteOrder);
                     index++;
-                }
+                } else if (index == 2) {
+                    int value2 = fis.read();
+                    int[] nums = {value, value2};
 
-                if (byteOrder == "LSB") {
-                    // get version
-                    if (index == 2) {
-                        int value2 = fis.read();
-                        int[] nums = {value, value2};
+                    String hexString = sumDecsToHexString(nums);
+                    System.out.println("Version: " + hexString);
 
-                        String hexString = sumDecsToHexString(nums);
-                        System.out.println("Version: " + hexString);
+                    index++;
+                } else if (index == 4) {
+                    int value2 = fis.read();
+                    int value3 = fis.read();
+                    int value4 = fis.read();
+                    int[] nums = {value, value2, value3, value4};
 
-                        index++;
-                    } else if (index == 4) {
-                        int value2 = fis.read();
-                        int value3 = fis.read();
-                        int value4 = fis.read();
-                        int[] nums = {value, value2, value3, value4};
+                    String hexString = sumDecsToHexString(nums);
+                    System.out.println("First Offset IFD: " + Integer.parseInt(hexString, 16));
 
-                        String hexString = sumDecsToHexString(nums);
-                        System.out.println("First Offset IFD: " + Integer.parseInt(hexString, 16));
+                    index += 3;
+                } else if (index == 8) {
+                    int value2 = fis.read();
+                    int[] nums = {value, value2};
 
-                        index += 3;
-                    } else if (index == 8) {
-                        int value2 = fis.read();
-                        int[] nums = {value, value2};
+                    String hexString = sumDecsToHexString(nums);
+                    totalDE = Integer.parseInt(hexString, 16);
 
-                        String hexString = sumDecsToHexString(nums);
-                        totalDE = Integer.parseInt(hexString, 16);
+                    System.out.println("--------------------- IFD Data -------------------------");
+                    System.out.println("Total DE: " + totalDE);
+                    dataEntryArr = new String[totalDE][8];
+                    index++;
+                } else if ((index >= 10 && index < (10 + 12 * totalDE)) && ((stripOffsets > 0 && index <= stripOffsets && ((index + 12) <= stripOffsets)) || (stripOffsets == -1))) {
+                    int tag1 = value;
+                    int tag2 = fis.read();
 
-                        System.out.println("--------------------- IFD Data -------------------------");
-                        System.out.println("Total DE: " + totalDE);
-                        dataEntryArr = new String[totalDE][8];
-                        index++;
-                    } else if ((index >= 10 && index < (10 + 12 * totalDE)) && ((stripOffsets > 0 && index <= stripOffsets && ((index + 12) <= stripOffsets)) || (stripOffsets == -1))) {
-                        int tag1 = value;
-                        int tag2 = fis.read();
+                    int type1 = fis.read();
+                    int type2 = fis.read();
 
-                        int type1 = fis.read();
-                        int type2 = fis.read();
+                    int length1 = fis.read();
+                    int length2 = fis.read();
+                    int length3 = fis.read();
+                    int length4 = fis.read();
 
-                        int length1 = fis.read();
-                        int length2 = fis.read();
-                        int length3 = fis.read();
-                        int length4 = fis.read();
+                    int value1 = fis.read();
+                    int value2 = fis.read();
+                    int value3 = fis.read();
+                    int value4 = fis.read();
 
-                        int value1 = fis.read();
-                        int value2 = fis.read();
-                        int value3 = fis.read();
-                        int value4 = fis.read();
+                    int[] tagNameNums = { tag1, tag2 };
+                    int[] tagTypeNums = { type1, type2 };
+                    
+                    String tagName = getTagName(tagNameNums);
+                    String tagTypeName = getTagTypeName(tagTypeNums);
 
-                        int[] tagNums = {tag1, tag2};
-                        int[] tagTypeNums = {type1, type2};
-                        int[] tagLengthNums = {length1, length2, length3, length4};
-                        int[] valueNums = {value1, value2, value3, value4};
+                    if (tagName != null && tagTypeName != null) {
+                        String tagValue = sumDecsToHexString(new int[] {value1, value2, value3, value4});
+                        String tagLength = sumDecsToHexString(new int[] {length1, length2, length3, length4});
 
-                        String tagHex = sumDecsToHexString(tagNums);
-                        int tagDec = Integer.parseInt(tagHex, 16);
+                        int tagValueDec = Integer.parseInt(tagValue, 16);
+                        int tagLengthDec = Integer.parseInt(tagLength, 16);
+                        int wordLength1 = 29 - tagName.length();
+                        int wordLength2 = 9 - tagTypeName.length();
 
-                        String tagTypeHex = sumDecsToHexString(tagTypeNums);
-                        int tagTypeDec = Integer.parseInt(tagTypeHex, 16);
+                        String wordSpaces1 = "";
+                        String wordSpaces2 = "";
 
-                        String tagName = getTagName(tagDec);
-                        String tagTypeName = getTagTypeName(tagTypeDec);
-
-                        if (tagName != null && tagTypeName != null) {
-                            String tagValue = sumDecsToHexString(valueNums);
-                            String tagLength = sumDecsToHexString(tagLengthNums);
-
-                            int tagValueDec = Integer.parseInt(tagValue, 16);
-                            int tagLengthDec = Integer.parseInt(tagLength, 16);
-                            int wordLength1 = 35 - (Integer.toString(tagDec).length() + 3 + tagName.length());
-                            int wordLength2 = 15 - (Integer.toString(tagTypeDec).length() + 3 + tagTypeName.length());
-
-                            String wordSpaces1 = "";
-                            String wordSpaces2 = "";
-
-                            for (int i = 0; i < wordLength1; i++) {
-                                wordSpaces1 += " ";
-                            }
-
-                            for (int i = 0; i < wordLength2; i++) {
-                                wordSpaces2 += " ";
-                            }
-
-                            if (tagDec == 273) {
-                                stripOffsets = tagValueDec;
-                                System.out.println("Size of IFD: " + stripOffsets);
-                            }
-
-                            dataEntryArr[dataEntryIndex1][0] = Integer.toString(tagDec);
-                            dataEntryArr[dataEntryIndex1][1] = tagName;
-                            dataEntryArr[dataEntryIndex1][2] = wordSpaces1;
-                            dataEntryArr[dataEntryIndex1][3] = Integer.toString(tagTypeDec);
-                            dataEntryArr[dataEntryIndex1][4] = tagTypeName;
-                            dataEntryArr[dataEntryIndex1][5] = wordSpaces2;
-                            dataEntryArr[dataEntryIndex1][6] = Integer.toString(tagLengthDec);
-                            dataEntryArr[dataEntryIndex1][7] = Integer.toString(tagValueDec);
-                            dataEntryIndex1++;
+                        for (int i = 0; i < wordLength1; i++) {
+                            wordSpaces1 += " ";
                         }
 
-                        index += 11;
-                    } else if (index == (10 + 12 * totalDE)) {
-                        int value2 = fis.read();
-                        int[] nums = { value, value2 };
-                        String offsetNextIFDHex = sumDecsToHexString(nums);
-                        offsetNextIFD = Integer.parseInt(offsetNextIFDHex, 16);
-                        System.out.println("Consecutive Offset IFD (Offset of Next IFD): " + offsetNextIFD);
-                    } else if (index >= 10 && stripOffsets > 0 && index >= stripOffsets) {
-                        if (index == (stripOffsets)) {
-                            System.out.println("--------------------- DE Data -------------------------");
-                            System.out.println("Tag                                Type          Length     Value");
-                            System.out.println("----------------------------------------------------------");
-
-                            for (int i = 0; i < (dataEntryArr.length - 1); i++) {
-                                if (dataEntryArr[i][0] != null) {
-                                    int tagDec = Integer.parseInt(dataEntryArr[i][0]);
-                                    String tagName = dataEntryArr[i][1];
-                                    String wordSpaces1 = dataEntryArr[i][2];
-                                    int tagTypeDec = Integer.parseInt(dataEntryArr[i][3]);
-                                    String tagTypeName = dataEntryArr[i][4];
-                                    String wordSpaces2 = dataEntryArr[i][5];
-                                    int tagLengthDec = Integer.parseInt(dataEntryArr[i][6]);
-                                    int tagValueDec = Integer.parseInt(dataEntryArr[i][7]);
-                                    System.out.println(tagDec + " (" + tagName + ")" + wordSpaces1 + tagTypeDec + " (" + tagTypeName + ")" + wordSpaces2 + tagLengthDec + "         " + tagValueDec);
-                                }
-                            }
-
-                            System.out.println("--------------------- Data Table -------------------------");
+                        for (int i = 0; i < wordLength2; i++) {
+                            wordSpaces2 += " ";
+                        }
+                        
+                        if (tagName == "StripOffsets") {
+                            stripOffsets = tagValueDec;
+                            System.out.println("Size of IFD: " + stripOffsets);
                         }
 
-                        String valueHex = String.format("%02X", value);
-                        System.out.print(valueHex);
+                        dataEntryArr[dataEntryIndex1][0] = Integer.toString(Integer.parseInt(sumDecsToHexString(tagNameNums), 16));
+                        dataEntryArr[dataEntryIndex1][1] = tagName;
+                        dataEntryArr[dataEntryIndex1][2] = wordSpaces1;
+                        dataEntryArr[dataEntryIndex1][3] = Integer.toString(Integer.parseInt(sumDecsToHexString(tagTypeNums), 16));
+                        dataEntryArr[dataEntryIndex1][4] = tagTypeName;
+                        dataEntryArr[dataEntryIndex1][5] = wordSpaces2;
+                        dataEntryArr[dataEntryIndex1][6] = Integer.toString(tagLengthDec);
+                        dataEntryArr[dataEntryIndex1][7] = Integer.toString(tagValueDec);
+                        dataEntryIndex1++;
+                    }
 
-                        if (dataColumnCount == 15) {
-                            System.out.println("");
-                            dataColumnCount = 0;
-                        } else {
+                    index += 11;
+                } else if (index == (10 + 12 * totalDE)) {
+                    int value2 = fis.read();
+                    int[] nums = {value, value2};
+                    String offsetNextIFDHex = sumDecsToHexString(nums);
+                    offsetNextIFD = Integer.parseInt(offsetNextIFDHex, 16);
+                    System.out.println("Consecutive Offset IFD (Offset of Next IFD): " + offsetNextIFD);
+                    index++;
+                } else if (index >= 10 && stripOffsets > 0 && index >= stripOffsets) {
+                    if (index == (stripOffsets)) {
+
+                        int totalRawBytesLength = (int) (file.length() - stripOffsets);
+                        rawBytes = new byte[totalRawBytesLength];
+
+                        System.out.println("--------------------- DE Data -------------------------");
+                        System.out.println("Tag                                Type          Length     Value");
+                        System.out.println("----------------------------------------------------------");
+
+                        for (int i = 0; i < (dataEntryArr.length - 1); i++) {
+                            if (dataEntryArr[i][0] != null) {
+                                int tagDec = Integer.parseInt(dataEntryArr[i][0]);
+                                String tagName = dataEntryArr[i][1];
+                                String wordSpaces1 = dataEntryArr[i][2];
+                                int tagTypeDec = Integer.parseInt(dataEntryArr[i][3]);
+                                String tagTypeName = dataEntryArr[i][4];
+                                String wordSpaces2 = dataEntryArr[i][5];
+                                int tagLengthDec = Integer.parseInt(dataEntryArr[i][6]);
+                                int tagValueDec = Integer.parseInt(dataEntryArr[i][7]);
+                                System.out.println(tagDec + " (" + tagName + ")" + wordSpaces1 + tagTypeDec + " (" + tagTypeName + ")" + wordSpaces2 + tagLengthDec + "         " + tagValueDec);
+                            }
+                        }
+
+                        System.out.println("--------------------- Data Table -------------------------");
+                    }
+
+                    String valueHex = String.format("%02X", value);
+                    System.out.print(valueHex);
+                    fop.write(value);
+
+                    if (dataColumnCount == 15) {
+                        System.out.println("");
+                        dataColumnCount = 0;
+                    } else {
+                        if (dataColumnCount % 2 != 0) {
                             System.out.print(" ");
-                            dataColumnCount++;
                         }
-                    }
-                } else if (byteOrder == "MSB") {
-                    // get version
-                    if (index == 2) {
-                        int value2 = fis.read();
-                        int[] nums = {value, value2};
-
-                        String hexString = sumDecsToHexString(nums);
-                        System.out.println("Version: " + hexString);
-
-                        index++;
+                        dataColumnCount++;
                     }
                 }
-
                 index++;
             }
-            // version
-            // first offset IFD
-            // DE total
-            // size of IFD
-            // Consecutive offset IFD
+            fop.close();
+            fis.close();
         } catch (IOException e) {
             System.out.println("File is not exists");
         }
@@ -216,7 +193,7 @@ public class Assignment1 {
 
     private static String sumDecsToHexString(int[] decNums) {
         String hexString = "";
-        
+
         for (int i = 0; i < decNums.length; i++) {
             if (byteOrder == "LSB") {
                 hexString += getHexString(decNums[decNums.length - (i + 1)]);
@@ -224,7 +201,7 @@ public class Assignment1 {
                 hexString += getHexString(decNums[i]);
             }
         }
-        
+
         return hexString;
     }
 
@@ -286,7 +263,7 @@ public class Assignment1 {
 
     private static String getTagTypeName(int tagTypeDec) {
         String tagTypeName = null;
-
+        
         switch (tagTypeDec) {
             case 1:
                 tagTypeName = "byte";
@@ -306,5 +283,25 @@ public class Assignment1 {
         }
 
         return tagTypeName;
+    }
+
+    private static String getTagName(String tagHex) {
+        int tagType = Integer.parseInt(tagHex, 16);
+        return getTagName(tagType);
+    }
+
+    private static String getTagName(int[] tagNums) {
+        String tagHex = sumDecsToHexString(tagNums);
+        return getTagName(tagHex);
+    }
+
+    private static String getTagTypeName(String tagTypeHex) {
+        int tagType = Integer.parseInt(tagTypeHex, 16);
+        return getTagTypeName(tagType);
+    }
+    
+    private static String getTagTypeName(int[] tagTypeNums) {
+        String tagTypeHex = sumDecsToHexString(tagTypeNums);
+        return getTagTypeName(tagTypeHex);
     }
 }
