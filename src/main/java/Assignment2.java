@@ -28,13 +28,19 @@ public class Assignment2 {
             System.out.println("---------------- Patterning Data ----------------");
             while ((value = fis.read()) != -1) {
                 int[][] patternDataInByte = getPattern(value);
-
-                int rowIndex1 = rowCount * 3;
-                int rowIndex2 = rowCount * 3 + 1;
-                int rowIndex3 = rowCount * 3 + 2;
-                int colIndex1 = colCount * 3;
-                int colIndex2 = colCount * 3 + 1;
-                int colIndex3 = colCount * 3 + 2;
+//
+//                int rowIndex1 = rowCount * 3;
+//                int rowIndex2 = rowCount * 3 + 1;
+//                int rowIndex3 = rowCount * 3 + 2;
+//                int colIndex1 = colCount * 3;
+//                int colIndex2 = colCount * 3 + 1;
+//                int colIndex3 = colCount * 3 + 2;
+                
+                for (int i = 0; i < 3; i++) {
+                    patterningData[rowCount * 3 + i][colCount * 3] = patternDataInByte[i][0];
+                    patterningData[rowCount * 3 + i][colCount * 3 + 1] = patternDataInByte[i][1];
+                    patterningData[rowCount * 3 + i][colCount * 3 + 2] = patternDataInByte[i][2];
+                }
 
 //                System.out.println("( " + rowIndex1 + ", " + colIndex1 + " ) = " + patternDataInByte[0][0]);
 //                System.out.println("( " + rowIndex1 + ", " + colIndex2 + " ) = " + patternDataInByte[0][1]);
@@ -45,15 +51,15 @@ public class Assignment2 {
 //                System.out.println("( " + rowIndex3 + ", " + colIndex1 + " ) = " + patternDataInByte[2][0]);
 //                System.out.println("( " + rowIndex3 + ", " + colIndex2 + " ) = " + patternDataInByte[2][1]);
 //                System.out.println("( " + rowIndex3 + ", " + colIndex3 + " ) = " + patternDataInByte[2][2]);
-                patterningData[rowIndex1][colIndex1] = patternDataInByte[0][0];
-                patterningData[rowIndex1][colIndex2] = patternDataInByte[0][1];
-                patterningData[rowIndex1][colIndex3] = patternDataInByte[0][2];
-                patterningData[rowIndex2][colIndex1] = patternDataInByte[1][0];
-                patterningData[rowIndex2][colIndex2] = patternDataInByte[1][1];
-                patterningData[rowIndex2][colIndex3] = patternDataInByte[1][2];
-                patterningData[rowIndex3][colIndex1] = patternDataInByte[2][0];
-                patterningData[rowIndex3][colIndex2] = patternDataInByte[2][1];
-                patterningData[rowIndex3][colIndex3] = patternDataInByte[2][2];
+//                patterningData[rowIndex1][colIndex1] = patternDataInByte[0][0];
+//                patterningData[rowIndex1][colIndex2] = patternDataInByte[0][1];
+//                patterningData[rowIndex1][colIndex3] = patternDataInByte[0][2];
+//                patterningData[rowIndex2][colIndex1] = patternDataInByte[1][0];
+//                patterningData[rowIndex2][colIndex2] = patternDataInByte[1][1];
+//                patterningData[rowIndex2][colIndex3] = patternDataInByte[1][2];
+//                patterningData[rowIndex3][colIndex1] = patternDataInByte[2][0];
+//                patterningData[rowIndex3][colIndex2] = patternDataInByte[2][1];
+//                patterningData[rowIndex3][colIndex3] = patternDataInByte[2][2];
 
                 if (colCount == 61) {
                     colCount = 0;
@@ -151,10 +157,5 @@ public class Assignment2 {
             }
         }
         return arrResult;
-    }
-    
-    private static int[] getColorArr() {
-        int[] emptyArr = new int [0];
-        return getColorArr(emptyArr);
     }
 }
