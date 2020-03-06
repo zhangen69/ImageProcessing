@@ -16,8 +16,8 @@ public class Assignment1 {
 
     public static void main(String[] args) {
         try {
-//            String fileName = "yoda.tif";
-            String fileName = "lena.tif";
+            String fileName = "yoda.tif";
+//            String fileName = "lena.tif";
             File file = new File(fileName);
             FileInputStream fis = new FileInputStream(file);
             System.out.println("File Name: " + file.getName());

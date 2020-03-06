@@ -13,7 +13,8 @@ import java.io.*;
 public class Assignment2 {
 
     public static void main(String[] args) {
-        String fileName = "yoda.raw";
+//        String fileName = "yoda.raw";
+        String fileName = "bedroom.raw";
         File file = new File(fileName);
         try {
             FileInputStream fis = new FileInputStream(file);
@@ -23,7 +24,8 @@ public class Assignment2 {
             int value;
             int colCount = 0;
             int rowCount = 0;
-            int[][] patterningData = new int[369][186];
+//            int[][] patterningData = new int[369][186];
+            int[][] patterningData = new int[1800][1800];
             int index = 0;
             System.out.println("---------------- Patterning Data ----------------");
             while ((value = fis.read()) != -1) {
@@ -35,11 +37,14 @@ public class Assignment2 {
 //                int colIndex1 = colCount * 3;
 //                int colIndex2 = colCount * 3 + 1;
 //                int colIndex3 = colCount * 3 + 2;
-                
+
                 for (int i = 0; i < 3; i++) {
-                    patterningData[rowCount * 3 + i][colCount * 3] = patternDataInByte[i][0];
-                    patterningData[rowCount * 3 + i][colCount * 3 + 1] = patternDataInByte[i][1];
-                    patterningData[rowCount * 3 + i][colCount * 3 + 2] = patternDataInByte[i][2];
+                    int streamVal1 = patterningData[rowCount * 3 + i][colCount * 3] = patternDataInByte[i][0];
+                    int streamVal2 = patterningData[rowCount * 3 + i][colCount * 3 + 1] = patternDataInByte[i][1];
+                    int streamVal3 = patterningData[rowCount * 3 + i][colCount * 3 + 2] = patternDataInByte[i][2];
+                    fout.write(streamVal1);
+                    fout.write(streamVal2);
+                    fout.write(streamVal3);
                 }
 
 //                System.out.println("( " + rowIndex1 + ", " + colIndex1 + " ) = " + patternDataInByte[0][0]);
@@ -61,7 +66,7 @@ public class Assignment2 {
 //                patterningData[rowIndex3][colIndex2] = patternDataInByte[2][1];
 //                patterningData[rowIndex3][colIndex3] = patternDataInByte[2][2];
 
-                if (colCount == 61) {
+                if (colCount == 599) {
                     colCount = 0;
                     rowCount++;
                 } else {
@@ -71,12 +76,12 @@ public class Assignment2 {
                 index++;
             }
 
-            for (int i = 0; i < patterningData.length; i++) {
-                for (int j = 0; j < patterningData[i].length; j++) {
-                    int streamVal = patterningData[i][j];
-                    fout.write(streamVal);
-                }
-            }
+//            for (int i = 0; i < patterningData.length; i++) {
+//                for (int j = 0; j < patterningData[i].length; j++) {
+//                    int streamVal = patterningData[i][j];
+//                    fout.write(streamVal);
+//                }
+//            }
             fout.close();
             fis.close();
         } catch (IOException ex) {
