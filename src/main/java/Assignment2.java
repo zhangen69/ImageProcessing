@@ -1,5 +1,7 @@
 
 import java.io.*;
+import java.nio.ByteBuffer;
+import java.nio.IntBuffer;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -13,75 +15,66 @@ import java.io.*;
 public class Assignment2 {
 
     public static void main(String[] args) {
-//        String fileName = "yoda.raw";
-        String fileName = "bedroom.raw";
-        File file = new File(fileName);
+        String srcFileName = "yoda.raw";
+//        String fileName = "bedroom.raw";
+        File file = new File(srcFileName);
         try {
             FileInputStream fis = new FileInputStream(file);
             File outputFile = new File("assignment2_pattern.raw");
             FileOutputStream fout = new FileOutputStream(outputFile);
-            System.out.println("File Name: " + file.getName());
-            int value;
-            int colCount = 0;
-            int rowCount = 0;
-//            int[][] patterningData = new int[369][186];
-            int[][] patterningData = new int[1800][1800];
-            int index = 0;
+            String fileName = file.getName();
+            int fileSize = (int) file.length();
+            System.out.println("---------------- Source File Info ----------------");
+            System.out.println("File Name: " + fileName);
+            System.out.println("File Size: " + fileSize);
             System.out.println("---------------- Patterning Data ----------------");
+            int index = 0;
+//            int orginalHeight = 600; // bedroom.raw
+//            int orginalWeight = 600; // bedroom.raw
+            int orginalHeight = 123; // yoda.raw
+            int orginalWeight = 62; // yoda.raw
+            int totalPatternSeq = (orginalHeight * 3) * (orginalWeight * 3);
+            int value;
+            int[][] data = new int[orginalHeight * 3][orginalWeight * 3];
+            int rowCount = 0;
+            int colCount = 0;
             while ((value = fis.read()) != -1) {
-                int[][] patternDataInByte = getPattern(value);
-//
-//                int rowIndex1 = rowCount * 3;
-//                int rowIndex2 = rowCount * 3 + 1;
-//                int rowIndex3 = rowCount * 3 + 2;
-//                int colIndex1 = colCount * 3;
-//                int colIndex2 = colCount * 3 + 1;
-//                int colIndex3 = colCount * 3 + 2;
-
+                int[] patternDataInByte = getPattern(value);
+                int patternWriteIndex = 0;
+                
                 for (int i = 0; i < 3; i++) {
-                    int streamVal1 = patterningData[rowCount * 3 + i][colCount * 3] = patternDataInByte[i][0];
-                    int streamVal2 = patterningData[rowCount * 3 + i][colCount * 3 + 1] = patternDataInByte[i][1];
-                    int streamVal3 = patterningData[rowCount * 3 + i][colCount * 3 + 2] = patternDataInByte[i][2];
-                    fout.write(streamVal1);
-                    fout.write(streamVal2);
-                    fout.write(streamVal3);
+                    for (int j = 0; j < 3; j++) {
+                        int patternVal = patternDataInByte[patternWriteIndex];
+                        data[rowCount * i][colCount * 3 + j] = patternVal;
+                        fout.write(patternVal);
+                        patternWriteIndex++;
+                    }
                 }
-
-//                System.out.println("( " + rowIndex1 + ", " + colIndex1 + " ) = " + patternDataInByte[0][0]);
-//                System.out.println("( " + rowIndex1 + ", " + colIndex2 + " ) = " + patternDataInByte[0][1]);
-//                System.out.println("( " + rowIndex1 + ", " + colIndex3 + " ) = " + patternDataInByte[0][2]);
-//                System.out.println("( " + rowIndex2 + ", " + colIndex1 + " ) = " + patternDataInByte[1][0]);
-//                System.out.println("( " + rowIndex2 + ", " + colIndex2 + " ) = " + patternDataInByte[1][1]);
-//                System.out.println("( " + rowIndex2 + ", " + colIndex3 + " ) = " + patternDataInByte[1][2]);
-//                System.out.println("( " + rowIndex3 + ", " + colIndex1 + " ) = " + patternDataInByte[2][0]);
-//                System.out.println("( " + rowIndex3 + ", " + colIndex2 + " ) = " + patternDataInByte[2][1]);
-//                System.out.println("( " + rowIndex3 + ", " + colIndex3 + " ) = " + patternDataInByte[2][2]);
-//                patterningData[rowIndex1][colIndex1] = patternDataInByte[0][0];
-//                patterningData[rowIndex1][colIndex2] = patternDataInByte[0][1];
-//                patterningData[rowIndex1][colIndex3] = patternDataInByte[0][2];
-//                patterningData[rowIndex2][colIndex1] = patternDataInByte[1][0];
-//                patterningData[rowIndex2][colIndex2] = patternDataInByte[1][1];
-//                patterningData[rowIndex2][colIndex3] = patternDataInByte[1][2];
-//                patterningData[rowIndex3][colIndex1] = patternDataInByte[2][0];
-//                patterningData[rowIndex3][colIndex2] = patternDataInByte[2][1];
-//                patterningData[rowIndex3][colIndex3] = patternDataInByte[2][2];
-
-                if (colCount == 599) {
+                
+                if (colCount == (orginalWeight - 1)) {
                     colCount = 0;
                     rowCount++;
                 } else {
                     colCount++;
                 }
 
+//                for (int i = 0; i < patternDataInByte.length; i++) {
+//                    fout.write(patternDataInByte[i]);
+//                }
                 index++;
             }
 
-//            for (int i = 0; i < patterningData.length; i++) {
-//                for (int j = 0; j < patterningData[i].length; j++) {
-//                    int streamVal = patterningData[i][j];
-//                    fout.write(streamVal);
-//                }
-//            }
+            if (index != fileSize || (index != (totalPatternSeq / 9))) {
+                System.out.println("last index " + index);
+                System.out.println("totalPatternSeq " + totalPatternSeq);
+                System.out.println("colCount " + colCount);
+                System.out.println("orginalWeight " + orginalWeight);
+                System.out.println("rowCount " + rowCount);
+                System.out.println("orginalHeight " + orginalHeight);
+                throw new Error("Something went wrong...");
+            }
+
+            fout.flush();
             fout.close();
             fis.close();
         } catch (IOException ex) {
@@ -89,21 +82,17 @@ public class Assignment2 {
         }
     }
 
-    private static int[][] getPattern(int colorDec) {
-        int[][] result = new int[3][3];
+    private static int[] getPattern(int colorDec) {
+        int[] result = new int[9];
 
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 10; i++) { // 10 type pattern
             int start = i * 25;
             int end = start + 25;
+            if (start != 0) {
+                start++;
+            }
             if (isBetween(colorDec, start, end)) {
-                int[] patternArr = getPatternArr(start / 25);
-                int count = 0;
-                for (int j = 0; j < 3; j++) {
-                    for (int k = 0; k < 3; k++) {
-                        result[j][k] = patternArr[count];
-                        count++;
-                    }
-                }
+                result = getPatternArr(i);
                 break;
             }
         }
@@ -112,55 +101,75 @@ public class Assignment2 {
     }
 
     private static int[] getPatternArr(int pattern) {
-        int[] arr = new int[] {};
+        int[] arr = new int[]{};
 
         switch (pattern) {
+            case 0:
+                arr = new int[]{
+                    0, 0, 0,
+                    0, 0, 0,
+                    0, 0, 0};
+                break;
             case 1:
-                arr = new int[] { 8 };
+                arr = new int[]{
+                    0, 0, 0,
+                    0, 0, 0,
+                    0, 0, 255};
                 break;
             case 2:
-                arr = new int[] { 0, 8 };
+                arr = new int[]{
+                    255, 0, 0,
+                    0, 0, 0,
+                    0, 0, 255};
                 break;
             case 3:
-                arr = new int[] { 0, 2, 8 };
+                arr = new int[]{
+                    255, 0, 255,
+                    0, 0, 0,
+                    0, 0, 255};
                 break;
             case 4:
-                arr = new int[] { 0, 2, 6, 8 };
+                arr = new int[]{
+                    255, 0, 255,
+                    0, 0, 0,
+                    255, 0, 255};
                 break;
             case 5:
-                arr = new int[] { 0, 2, 6, 7, 8 };
+                arr = new int[]{
+                    255, 0, 255,
+                    0, 0, 0,
+                    255, 255, 255};
                 break;
             case 6:
-                arr = new int[] { 0, 2, 3, 6, 7, 8 };
+                arr = new int[]{
+                    255, 0, 255,
+                    255, 0, 0,
+                    255, 255, 255};
                 break;
             case 7:
-                arr = new int[] { 0, 1, 2, 3, 6, 7, 8 };
+                arr = new int[]{
+                    255, 255, 255,
+                    255, 0, 0,
+                    255, 255, 255};
                 break;
             case 8:
-                arr = new int[] { 0, 1, 2, 3, 5, 6, 7, 8 };
+                arr = new int[]{
+                    255, 255, 255,
+                    255, 0, 255,
+                    255, 255, 255};
                 break;
             case 9:
-                arr = new int[] { 0, 1, 2, 3, 4, 5, 6, 7, 8 };
+                arr = new int[]{
+                    255, 255, 255,
+                    255, 255, 255,
+                    255, 255, 255};
                 break;
         }
 
-        return getColorArr(arr);
+        return arr;
     }
 
-    private static boolean isBetween(int x, int lower, int upper) {
-        return lower <= x && x <= upper;
-    }
-
-    private static int[] getColorArr(int[] whiteIndexes) {
-        int[] arrResult = new int[10];
-        for (int i = 0; i < 10; i++) {
-            for (int j = 0; j < whiteIndexes.length; j++) {
-                if (i == whiteIndexes[j]) {
-                    arrResult[i] = 255;
-                    break;
-                } 
-            }
-        }
-        return arrResult;
+    private static boolean isBetween(int x, int start, int end) {
+        return start <= x && x <= end;
     }
 }
