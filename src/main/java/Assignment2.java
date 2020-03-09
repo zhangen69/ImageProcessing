@@ -31,8 +31,8 @@ public class Assignment2 {
             int index = 0;
             int orginalHeight = 600; // bedroom.raw
             int orginalWeight = 600; // bedroom.raw
-//            int orginalHeight = 123; // yoda.raw
-//            int orginalWeight = 62; // yoda.raw
+//            int orginalHeight = 62; // yoda.raw
+//            int orginalWeight = 123; // yoda.raw
             int totalPatternSeq = (orginalHeight * 3) * (orginalWeight * 3);
             int value;
             int[][] data = new int[orginalHeight * 3][orginalWeight * 3];
@@ -42,20 +42,49 @@ public class Assignment2 {
                 int[] patternDataInByte = getPattern(value);
                 int patternWriteIndex = 0;
                 
-                for (int i = 0; i < 3; i++) {
-                    for (int j = 0; j < 3; j++) {
-                        int patternVal = patternDataInByte[patternWriteIndex];
-                        data[rowCount * i][colCount * 3 + j] = patternVal;
-//                        fout.write(patternVal);
-//                        patternWriteIndex++;
-                    }
-                }
+//                for (int i = 0; i < 3; i++) {
+//                    for (int j = 0; j < 3; j++) {
+//                        int patternVal = patternDataInByte[patternWriteIndex];
+//                        data[rowCount * i][colCount * 3 + j] = patternVal;
+////                        fout.write(patternVal);
+////                        patternWriteIndex++;
+//                    }
+//                }
+
+                int rowIndex1 = rowCount * 3;
+                int rowIndex2 = rowIndex1 + 1;
+                int rowIndex3 = rowIndex2 + 1;
+                int colIndex1 = colCount * 3;
+                int colIndex2 = colIndex1 + 1;
+                int colIndex3 = colIndex2 + 1;
+
+                writeData(data, rowIndex1, colIndex1, patternDataInByte[0]);
+                writeData(data, rowIndex1, colIndex2, patternDataInByte[1]);
+                writeData(data, rowIndex1, colIndex3, patternDataInByte[2]);
+                writeData(data, rowIndex2, colIndex1, patternDataInByte[3]);
+                writeData(data, rowIndex2, colIndex2, patternDataInByte[4]);
+                writeData(data, rowIndex2, colIndex3, patternDataInByte[5]);
+                writeData(data, rowIndex3, colIndex1, patternDataInByte[6]);
+                writeData(data, rowIndex3, colIndex2, patternDataInByte[7]);
+                writeData(data, rowIndex3, colIndex3, patternDataInByte[8]);
                 
-                if (colCount == (orginalWeight - 1)) {
+//                data[rowIndex1][colIndex1] = patternDataInByte[0];
+//                data[rowIndex1][colIndex2] = patternDataInByte[1];
+//                data[rowIndex1][colIndex3] = patternDataInByte[2];
+//                data[rowIndex2][colIndex1] = patternDataInByte[3];
+//                data[rowIndex2][colIndex2] = patternDataInByte[4];
+//                data[rowIndex2][colIndex3] = patternDataInByte[5];
+//                data[rowIndex3][colIndex1] = patternDataInByte[6];
+//                data[rowIndex3][colIndex2] = patternDataInByte[7];
+//                data[rowIndex3][colIndex3] = patternDataInByte[8];
+                
+                if (colCount == (orginalWeight - 1) && rowCount < orginalHeight) {
                     colCount = 0;
                     rowCount++;
-                } else {
+                } else if (colCount < orginalWeight && rowCount < orginalHeight) {
                     colCount++;
+                } else {
+                    throw new Error("condition error");
                 }
 
 //                for (int i = 0; i < patternDataInByte.length; i++) {
@@ -74,13 +103,18 @@ public class Assignment2 {
                 throw new Error("Something went wrong...");
             }
             
+            int writeCount = 0;
+            
             for (int[] data1 : data) {
                 for (int j = 0; j < data1.length; j++) {
                     fout.write(data1[j]);
+                    writeCount++;
                 }
             }
+            
+            System.out.println("Count: " + writeCount);
 
-            fout.flush();
+//            fout.flush();
             fout.close();
             fis.close();
         } catch (IOException ex) {
@@ -95,9 +129,6 @@ public class Assignment2 {
         for (int i = 0; i < 10; i++) { // 10 type pattern
             int start = i * baseNum;
             int end = start + baseNum;
-            if (start != 0) {
-                start++;
-            }
             if (isBetween(colorDec, start, end)) {
                 result = getPatternArr(i);
                 break;
@@ -178,5 +209,13 @@ public class Assignment2 {
 
     private static boolean isBetween(int x, int start, int end) {
         return start <= x && x <= end;
+    }
+    
+    private static void writeData(int[][] data, int x, int y, int value) {
+        if (data[x][y] == 0) {
+            data[x][y] = value;
+        } else {
+            throw new Error("the array position has value");
+        }
     }
 }
