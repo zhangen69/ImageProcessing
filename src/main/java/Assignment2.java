@@ -15,8 +15,8 @@ import java.nio.IntBuffer;
 public class Assignment2 {
 
     public static void main(String[] args) {
-        String srcFileName = "yoda.raw";
-//        String fileName = "bedroom.raw";
+//        String srcFileName = "yoda.raw";
+        String srcFileName = "bedroom.raw";
         File file = new File(srcFileName);
         try {
             FileInputStream fis = new FileInputStream(file);
@@ -29,10 +29,10 @@ public class Assignment2 {
             System.out.println("File Size: " + fileSize);
             System.out.println("---------------- Patterning Data ----------------");
             int index = 0;
-//            int orginalHeight = 600; // bedroom.raw
-//            int orginalWeight = 600; // bedroom.raw
-            int orginalHeight = 123; // yoda.raw
-            int orginalWeight = 62; // yoda.raw
+            int orginalHeight = 600; // bedroom.raw
+            int orginalWeight = 600; // bedroom.raw
+//            int orginalHeight = 123; // yoda.raw
+//            int orginalWeight = 62; // yoda.raw
             int totalPatternSeq = (orginalHeight * 3) * (orginalWeight * 3);
             int value;
             int[][] data = new int[orginalHeight * 3][orginalWeight * 3];
@@ -46,8 +46,8 @@ public class Assignment2 {
                     for (int j = 0; j < 3; j++) {
                         int patternVal = patternDataInByte[patternWriteIndex];
                         data[rowCount * i][colCount * 3 + j] = patternVal;
-                        fout.write(patternVal);
-                        patternWriteIndex++;
+//                        fout.write(patternVal);
+//                        patternWriteIndex++;
                     }
                 }
                 
@@ -73,6 +73,12 @@ public class Assignment2 {
                 System.out.println("orginalHeight " + orginalHeight);
                 throw new Error("Something went wrong...");
             }
+            
+            for (int[] data1 : data) {
+                for (int j = 0; j < data1.length; j++) {
+                    fout.write(data1[j]);
+                }
+            }
 
             fout.flush();
             fout.close();
@@ -84,10 +90,11 @@ public class Assignment2 {
 
     private static int[] getPattern(int colorDec) {
         int[] result = new int[9];
+        int baseNum = 255 / 10;
 
         for (int i = 0; i < 10; i++) { // 10 type pattern
-            int start = i * 25;
-            int end = start + 25;
+            int start = i * baseNum;
+            int end = start + baseNum;
             if (start != 0) {
                 start++;
             }
