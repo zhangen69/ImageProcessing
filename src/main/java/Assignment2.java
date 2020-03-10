@@ -15,8 +15,9 @@ import java.nio.IntBuffer;
 public class Assignment2 {
 
     public static void main(String[] args) {
-//        String srcFileName = "yoda.raw";
-        String srcFileName = "bedroom.raw";
+        String srcFileName = "yoda.raw";
+//        String srcFileName = "bedroom.raw";
+//        String srcFileName = "Imgpro.raw";
         File file = new File(srcFileName);
         try {
             FileInputStream fis = new FileInputStream(file);
@@ -29,10 +30,12 @@ public class Assignment2 {
             System.out.println("File Size: " + fileSize);
             System.out.println("---------------- Patterning Data ----------------");
             int index = 0;
-            int orginalHeight = 600; // bedroom.raw
-            int orginalWeight = 600; // bedroom.raw
-//            int orginalHeight = 62; // yoda.raw
-//            int orginalWeight = 123; // yoda.raw
+//            int orginalHeight = 600; // bedroom.raw
+//            int orginalWeight = 600; // bedroom.raw
+//            int orginalHeight = 100; // Imgpro.raw
+//            int orginalWeight = 122; // Imgpro.raw
+            int orginalHeight = 62; // yoda.raw
+            int orginalWeight = 123; // yoda.raw
             int totalPatternSeq = (orginalHeight * 3) * (orginalWeight * 3);
             int value;
             int[][] data = new int[orginalHeight * 3][orginalWeight * 3];
@@ -41,15 +44,6 @@ public class Assignment2 {
             while ((value = fis.read()) != -1) {
                 int[] patternDataInByte = getPattern(value);
                 int patternWriteIndex = 0;
-                
-//                for (int i = 0; i < 3; i++) {
-//                    for (int j = 0; j < 3; j++) {
-//                        int patternVal = patternDataInByte[patternWriteIndex];
-//                        data[rowCount * i][colCount * 3 + j] = patternVal;
-////                        fout.write(patternVal);
-////                        patternWriteIndex++;
-//                    }
-//                }
 
                 int rowIndex1 = rowCount * 3;
                 int rowIndex2 = rowIndex1 + 1;
@@ -67,17 +61,7 @@ public class Assignment2 {
                 writeData(data, rowIndex3, colIndex1, patternDataInByte[6]);
                 writeData(data, rowIndex3, colIndex2, patternDataInByte[7]);
                 writeData(data, rowIndex3, colIndex3, patternDataInByte[8]);
-                
-//                data[rowIndex1][colIndex1] = patternDataInByte[0];
-//                data[rowIndex1][colIndex2] = patternDataInByte[1];
-//                data[rowIndex1][colIndex3] = patternDataInByte[2];
-//                data[rowIndex2][colIndex1] = patternDataInByte[3];
-//                data[rowIndex2][colIndex2] = patternDataInByte[4];
-//                data[rowIndex2][colIndex3] = patternDataInByte[5];
-//                data[rowIndex3][colIndex1] = patternDataInByte[6];
-//                data[rowIndex3][colIndex2] = patternDataInByte[7];
-//                data[rowIndex3][colIndex3] = patternDataInByte[8];
-                
+
                 if (colCount == (orginalWeight - 1) && rowCount < orginalHeight) {
                     colCount = 0;
                     rowCount++;
@@ -87,9 +71,6 @@ public class Assignment2 {
                     throw new Error("condition error");
                 }
 
-//                for (int i = 0; i < patternDataInByte.length; i++) {
-//                    fout.write(patternDataInByte[i]);
-//                }
                 index++;
             }
 
@@ -102,21 +83,130 @@ public class Assignment2 {
                 System.out.println("orginalHeight " + orginalHeight);
                 throw new Error("Something went wrong...");
             }
-            
+
             int writeCount = 0;
-            
+
             for (int[] data1 : data) {
                 for (int j = 0; j < data1.length; j++) {
                     fout.write(data1[j]);
                     writeCount++;
                 }
             }
-            
-            System.out.println("Count: " + writeCount);
 
-//            fout.flush();
+            fout.flush();
             fout.close();
             fis.close();
+
+            System.out.println("---------------- Dithering D1 Data ----------------");
+            FileInputStream fis_d1 = new FileInputStream(file);
+            File outputFile_d1 = new File("assignment2_d1.raw");
+            FileOutputStream fout_d1 = new FileOutputStream(outputFile_d1);
+            int[] d1Model = {0, 128, 192, 64};
+            int[][] d1Data = new int[orginalHeight][orginalWeight];
+            index = 0;
+            colCount = 0;
+            rowCount = 0;
+            while ((value = fis_d1.read()) != -1) {
+
+                if ((rowCount == 0 || rowCount % 2 == 0) && (colCount == 0 || colCount % 2 == 0)) {
+                    // check 0
+                    d1Data[rowCount][colCount] = value > d1Model[0] ? 255 : 0;
+                } else if ((rowCount == 0 || rowCount % 2 == 0) && (colCount + 1) % 2 == 0) {
+                    // check 128
+                    d1Data[rowCount][colCount] = value > d1Model[1] ? 255 : 0;
+                } else if (rowCount > 0 && (rowCount + 1) % 2 == 0 && (colCount == 0 || colCount % 2 == 0)) {
+                    // check 192
+                    d1Data[rowCount][colCount] = value > d1Model[2] ? 255 : 0;
+                } else if (rowCount > 0 && (rowCount + 1) % 2 == 0) {
+                    // check 64
+                    d1Data[rowCount][colCount] = value > d1Model[3] ? 255 : 0;
+                }
+
+                if (colCount == (orginalWeight - 1) && rowCount < orginalHeight) {
+                    colCount = 0;
+                    rowCount++;
+                } else if (colCount < orginalWeight && rowCount < orginalHeight) {
+                    colCount++;
+                } else {
+                    throw new Error("condition error");
+                }
+
+                index++;
+            }
+
+            for (int[] dataSet : d1Data) {
+                for (int i = 0; i < dataSet.length; i++) {
+                    fout_d1.write(dataSet[i]);
+                }
+            }
+
+            fout_d1.flush();
+            fout_d1.close();
+            fis_d1.close();
+
+            System.out.println("---------------- Dithering D1 Data ----------------");
+            FileInputStream fis_d2 = new FileInputStream(file);
+            File outputFile_d2 = new File("assignment2_d2.raw");
+            FileOutputStream fout_d2 = new FileOutputStream(outputFile_d2);
+            int[][] d2Model = {
+                {   0, 128,  32, 160 },
+                { 192,  64, 224,  96 },
+                {  48, 176,  16, 144 },
+                { 240, 112, 208,  80 },
+            };
+            int[][] d2Data = new int[orginalHeight][orginalWeight];
+            index = 0;
+            colCount = 0;
+            rowCount = 0;
+            while ((value = fis_d2.read()) != -1) {
+                
+                int modelRowIndex;
+                int modelColIndex;
+                
+                if ((rowCount + 1) % 4 == 0) {
+                    modelRowIndex = 3;
+                } else if ((rowCount + 1) % 3 == 0) {
+                    modelRowIndex = 2;
+                } else if ((rowCount + 1) % 2 == 0) {
+                    modelRowIndex = 1;
+                } else {
+                    modelRowIndex = 0;
+                }
+                
+                if ((colCount + 1) % 4 == 0) {
+                    modelColIndex = 3;
+                } else if ((colCount + 1) % 3 == 0) {
+                    modelColIndex = 2;
+                } else if ((colCount + 1) % 2 == 0) {
+                    modelColIndex = 1;
+                } else {
+                    modelColIndex = 0;
+                }
+                
+                d2Data[rowCount][colCount] = value > d2Model[modelRowIndex][modelColIndex] ? 255 : 0;
+                  
+                if (colCount == (orginalWeight - 1) && rowCount < orginalHeight) {
+                    colCount = 0;
+                    rowCount++;
+                } else if (colCount < orginalWeight && rowCount < orginalHeight) {
+                    colCount++;
+                } else {
+                    throw new Error("condition error");
+                }
+
+                index++;
+            }
+
+            for (int[] dataSet : d2Data) {
+                for (int i = 0; i < dataSet.length; i++) {
+                    fout_d2.write(dataSet[i]);
+                }
+            }
+
+            fout_d2.flush();
+            fout_d2.close();
+            fis_d2.close();
+
         } catch (IOException ex) {
             System.out.println("File is not exists");
         }
@@ -124,12 +214,12 @@ public class Assignment2 {
 
     private static int[] getPattern(int colorDec) {
         int[] result = new int[9];
-        int baseNum = 255 / 10;
+        double baseNum = 25.5;
 
         for (int i = 0; i < 10; i++) { // 10 type pattern
-            int start = i * baseNum;
-            int end = start + baseNum;
-            if (isBetween(colorDec, start, end)) {
+            double start = i * baseNum;
+            double end = start + baseNum;
+            if (start <= colorDec && colorDec <= end) {
                 result = getPatternArr(i);
                 break;
             }
@@ -210,7 +300,7 @@ public class Assignment2 {
     private static boolean isBetween(int x, int start, int end) {
         return start <= x && x <= end;
     }
-    
+
     private static void writeData(int[][] data, int x, int y, int value) {
         if (data[x][y] == 0) {
             data[x][y] = value;
