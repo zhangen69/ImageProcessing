@@ -62,15 +62,15 @@ public class Assignment4 {
             for (int rowIndex = 1; rowIndex < originalImgArr.length - 2; rowIndex++) {
                 for (int colIndex = 1; colIndex < originalImgArr[rowIndex].length - 2; colIndex++) {
                     int kernel1 = hMatric[0][0] * originalImgArr[rowIndex + 1][colIndex + 1]; // h(0,0) f (X + 1, Y + 1) 
-//                        int kernel2 = hMatric[0][1] * convolutionImgArr[rowIndex + 1][colIndex]; // h(1,0) f (X, Y + 1) 
+                    int kernel2 = hMatric[0][1] * convolutionImgArr[rowIndex + 1][colIndex]; // h(1,0) f (X, Y + 1) 
                     int kernel3 = hMatric[0][2] * originalImgArr[rowIndex + 1][colIndex - 1]; // h(2,0) f (X - 1, Y + 1) 
 
                     int kernel4 = hMatric[1][0] * originalImgArr[rowIndex][colIndex + 1]; // h(0,1) f(X+1,Y)
-//                        int kernel5 = hMatric[1][1] * convolutionImgArr[rowIndex][colIndex]; // h(1,1) f (X, Y)
+                    int kernel5 = hMatric[1][1] * convolutionImgArr[rowIndex][colIndex]; // h(1,1) f (X, Y)
                     int kernel6 = hMatric[1][2] * originalImgArr[rowIndex][colIndex - 1]; // h(2,1) f (X - 1, Y)
 
                     int kernel7 = hMatric[2][0] * originalImgArr[rowIndex - 1][colIndex + 1]; // h(0,2) f (X + 1, Y - 1) 
-//                        int kernel8 = hMatric[2][1] * convolutionImgArr[rowIndex - 1][colIndex]; // h(1,2) f (X, Y - 1) 
+                    int kernel8 = hMatric[2][1] * convolutionImgArr[rowIndex - 1][colIndex]; // h(1,2) f (X, Y - 1) 
                     int kernel9 = hMatric[2][2] * originalImgArr[rowIndex - 1][colIndex - 1]; // h(2,2) f (X - 1, Y - 1)
 
 //                    int sum = checkKernelValue(kernel1) + checkKernelValue(kernel3) + checkKernelValue(kernel4) + checkKernelValue(kernel6) + checkKernelValue(kernel7) + checkKernelValue(kernel9);
@@ -101,14 +101,14 @@ public class Assignment4 {
             System.out.println("Error: " + e.toString());
         }
     }
-    
+
     private static int checkKernelValue(int value) {
         if (value < 0) {
             return 0;
         } else if (value > 255) {
             return 255;
         }
-                    
+
         return value;
     }
 }
