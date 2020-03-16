@@ -24,6 +24,10 @@ public class Assignment3 {
             String fileName = file.getName();
             int fileSize = (int) file.length();
             int[] numberOfPixels = new int[256];
+            
+            System.out.println("File Name: " + fileName);
+            System.out.println("File Size: " + fileSize);
+            
             int value;
             
             while((value = fis.read()) != -1) {
@@ -60,7 +64,7 @@ public class Assignment3 {
             int[] multipliedRunningSumNums = new int[256];
             
             System.out.println("---------------- Histogram Equalized Values ----------------");
-            System.out.println("Gray-Level   No of Pixel    Run Sum        Normalized             Multiply 255 :");
+            System.out.println("Gray-Level   No of Pixel    Run Sum        Normalized             Multiply 255");
             System.out.println("------------------------------------------------------------");
             
             for (int i = 0; i < normalizedRunningSumNums.length; i++) {
