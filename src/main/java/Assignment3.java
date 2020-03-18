@@ -1,6 +1,7 @@
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.math.BigDecimal;
 
 /*
@@ -23,15 +24,23 @@ public class Assignment3 {
             FileInputStream fis = new FileInputStream(file);
             String fileName = file.getName();
             int fileSize = (int) file.length();
+//            int height = 600; // bedroom
+//            int weight = 600; // bedroom
+            int height = 62; // yoda
+            int weight = 123; // yoda
+            int[] originalImg = new int[weight * height];
             int[] numberOfPixels = new int[256];
             
             System.out.println("File Name: " + fileName);
             System.out.println("File Size: " + fileSize);
             
             int value;
+            int index = 0;
             
             while((value = fis.read()) != -1) {
+                originalImg[index] = value;
                 numberOfPixels[value]++;
+                index++;
             }
             
             
@@ -97,6 +106,16 @@ public class Assignment3 {
                 System.out.println(i + space0 + numberOfPixels[i] + space1 + runningSumNums[i] + space2 + normalizedRunningSumNums[i] + space3 + multipliedRunningSumNums[i]);
             }
             
+            File outputFile = new File("assignment3.raw");
+            FileOutputStream fout = new FileOutputStream(outputFile);
+            
+            for (int i = 0; i < originalImg.length; i++) {
+                fout.write(multipliedRunningSumNums[originalImg[i]]);
+            }
+            
+            fout.flush();
+            fout.close(); // close file output stream
+            fis.close(); // close file input stream
 //            System.out.println("---------------- Step 4: Map the gray-level to the result ----------------");
         } catch (Exception e) {
         }
