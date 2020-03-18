@@ -16,18 +16,18 @@ import java.math.BigDecimal;
  */
 public class Assignment3 {
     public static void main(String[] args) {
-        String srcFileName = "yoda.raw";
-//        String srcFileName = "bedroom.raw";
+//        String srcFileName = "yoda.raw";
+        String srcFileName = "bedroom.raw";
 //        String srcFileName = "Imgpro.raw";
         File file = new File(srcFileName);
         try {
             FileInputStream fis = new FileInputStream(file);
             String fileName = file.getName();
             int fileSize = (int) file.length();
-//            int height = 600; // bedroom
-//            int weight = 600; // bedroom
-            int height = 62; // yoda
-            int weight = 123; // yoda
+            int height = 600; // bedroom
+            int weight = 600; // bedroom
+//            int height = 62; // yoda
+//            int weight = 123; // yoda
             int[] originalImg = new int[weight * height];
             int[] numberOfPixels = new int[256];
             
