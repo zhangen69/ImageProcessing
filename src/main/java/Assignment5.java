@@ -16,16 +16,18 @@ import java.io.IOException;
 public class Assignment5 {
 
     public static void main(String[] args) {
-        String srcFileName = "yoda.raw";
-//        String srcFileName = "bedroom.raw";
+//        String srcFileName = "yoda.raw";
+        String srcFileName = "bedroom.raw";
 //        String srcFileName = "Imgpro.raw";
         File file = new File(srcFileName);
         try {
             FileInputStream fis = new FileInputStream(file);
             String fileName = file.getName();
             int fileSize = (int) file.length();
-            int weight = 123;
-            int height = 62;
+//            int weight = 123; // yuda
+//            int height = 62; // yuda
+            int weight = 600; // bedroom
+            int height = 600; // bedroom
             int[][] originalImgArr = new int[height][weight];
             int[][] convolutionImgArr = new int[height][weight];
 
